@@ -24,4 +24,16 @@ curl -X GET "https://qk03j06gu7.execute-api.us-east-2.amazonaws.com/test/student
 }
 
 
+curl -X PATCH \
+ 'https://qk03j06gu7.execute-api.us-east-2.amazonaws.com/test/students?student_id=abc' \
+ -H 'Content-Type: application/json' \
+ -d '{
+"name": "John Wick Updated",
+"course": "Hacker Software Advanced"
+}'
+
+curl -X DELETE \
+ 'https://qk03j06gu7.execute-api.us-east-2.amazonaws.com/test/students?student_id=123'
+
+
 

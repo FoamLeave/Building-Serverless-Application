@@ -16,3 +16,5 @@ https://us-east-1.console.aws.amazon.com/iam/home#/roles
 - json dumps then do json load problem
 
 https://stackoverflow.com/questions/42354001/json-object-must-be-str-bytes-or-bytearray-not-dict
+
+- reserved keywords

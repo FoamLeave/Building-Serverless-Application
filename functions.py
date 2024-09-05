@@ -17,11 +17,9 @@ def lambda_handler(event, context):
 
     if http_method == 'POST':
         try:
-            # Ensure body is a dictionary
+            # Get the body of the request and parse it
             body = json.loads(json.dumps(event['body']))
-            if isinstance(body, str):
-                body = json.loads(body)
-            student = body
+            student = body  # Ensure this is a dictionary
             logger.info(f"Student data: {student}")
 
             if not student or 'student_id' not in student or 'name' not in student or 'course' not in student:
@@ -76,37 +74,6 @@ def lambda_handler(event, context):
                 'body': json.dumps(f'Error fetching student record: {str(e)}')
             }
 
-    elif http_method == 'DELETE':
-        student_id = event.get('queryStringParameters', {}).get('student_id')
-        if not student_id:
-            logger.error("Missing student_id in query parameters.")
-            return {
-                'statusCode': 400,
-                'body': json.dumps('Missing student_id in query parameters.')
-            }
-
-        try:
-            response = table.delete_item(Key={'student_id': student_id})
-            if response.get('Attributes'):
-                logger.info("Student record deleted successfully")
-                return {
-                    'statusCode': 200,
-                    'body': json.dumps('Student record deleted successfully')
-                }
-            else:
-                logger.error("Student record not found.")
-                return {
-                    'statusCode': 404,
-                    'body': json.dumps('Student record not found.')
-                }
-        except Exception as e:
-            logger.error(
-                f"Error deleting student record: {str(e)}", exc_info=True)
-            return {
-                'statusCode': 500,
-                'body': json.dumps(f'Error deleting student record: {str(e)}')
-            }
-
     elif http_method == 'PATCH':
         student_id = event.get('queryStringParameters', {}).get('student_id')
         if not student_id:
@@ -116,26 +83,36 @@ def lambda_handler(event, context):
                 'body': json.dumps('Missing student_id in query parameters.')
             }
 
-        update_body = json.loads(json.dumps(event['body']))
-        if isinstance(update_body, str):
-            update_body = json.loads(update_body)
-        if not update_body:
-            logger.error("Invalid input: No update data provided.")
-            return {
-                'statusCode': 400,
-                'body': json.dumps('Invalid input: No update data provided.')
-            }
+        body = json.loads(json.dumps(event['body']))
+        update_expression = "SET"
+        expression_attribute_names = {}
+        expression_attribute_values = {}
+        logger.info(f"body.items: {body.items()}")
 
-        update_expression = "SET " + \
-            ", ".join(f"{key}=:{key}" for key in update_body.keys())
-        expression_values = {f":{key}": value for key,
-                             value in update_body.items()}
+        for key, value in body.items():
+            if key in ['name', 'course']:  # Reserved keywords
+                expression_attribute_names[f'#{key}'] = key
+                update_expression += f" #{key} = :{key},"
+                expression_attribute_values[f":{key}"] = value
+
+            else:
+                update_expression += f" {key} = :{key},"
+                expression_attribute_values[f":{key}"] = value
+
+        update_expression = update_expression.rstrip(',')
+
+        logger.info(f"update_expression: {update_expression}")
+        logger.info(
+            f"expression_attribute_names: {expression_attribute_names}")
+        logger.info(
+            f"expression_attribute_values: {expression_attribute_values}")
 
         try:
             table.update_item(
                 Key={'student_id': student_id},
                 UpdateExpression=update_expression,
-                ExpressionAttributeValues=expression_values
+                ExpressionAttributeNames=expression_attribute_names,
+                ExpressionAttributeValues=expression_attribute_values
             )
             logger.info("Student record updated successfully")
             return {
@@ -150,9 +127,33 @@ def lambda_handler(event, context):
                 'body': json.dumps(f'Error updating student record: {str(e)}')
             }
 
+    elif http_method == 'DELETE':
+        student_id = event.get('queryStringParameters', {}).get('student_id')
+        if not student_id:
+            logger.error("Missing student_id in query parameters.")
+            return {
+                'statusCode': 400,
+                'body': json.dumps('Missing student_id in query parameters.')
+            }
+
+        try:
+            table.delete_item(Key={'student_id': student_id})
+            logger.info("Student record deleted successfully")
+            return {
+                'statusCode': 200,
+                'body': json.dumps('Student record deleted successfully')
+            }
+        except Exception as e:
+            logger.error(
+                f"Error deleting student record: {str(e)}", exc_info=True)
+            return {
+                'statusCode': 500,
+                'body': json.dumps(f'Error deleting student record: {str(e)}')
+            }
+
     else:
         logger.error(f"Method {http_method} Not Allowed")
         return {
             'statusCode': 405,
-            'body': json.dumps('Method Not Allowed. Only POST, GET, DELETE, and PATCH are supported.')
+            'body': json.dumps('Method Not Allowed. Only POST, GET, PATCH, and DELETE are supported.')
         }

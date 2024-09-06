@@ -17,9 +17,9 @@ def lambda_handler(event, context):
 
     if http_method == 'POST':
         try:
-            # Get the body of the request and parse it
+
             body = json.loads(json.dumps(event['body']))
-            student = body  # Ensure this is a dictionary
+            student = body
             logger.info(f"Student data: {student}")
 
             if not student or 'student_id' not in student or 'name' not in student or 'course' not in student:
@@ -90,7 +90,7 @@ def lambda_handler(event, context):
         logger.info(f"body.items: {body.items()}")
 
         for key, value in body.items():
-            if key in ['name', 'course']:  # Reserved keywords
+            if key in ['name', 'course']:
                 expression_attribute_names[f'#{key}'] = key
                 update_expression += f" #{key} = :{key},"
                 expression_attribute_values[f":{key}"] = value

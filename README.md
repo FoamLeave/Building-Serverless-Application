@@ -1,5 +1,37 @@
 # Building-Serverless-Application
 
+The table at the beginning:
+
+![](apiScreenShot/tableInit.png)
+
+Post Cmd screenshots:
+
+![](apiScreenShot/postCmd.png)
+
+The table after executed post cmd:
+
+![](apiScreenShot/postTable.png)
+
+Get cmd screenshots:
+
+![](apiScreenShot/getCmd.png)
+
+Patch Cmd Screenshots:
+
+![](apiScreenShot/patchCmd.png)
+
+Table after the patch cmds executed:
+
+![](apiScreenShot/tableAfterPatch.png)
+
+Delete Cmd Screenshots:
+
+![](apiScreenShot/deleteCmd.png)
+
+Table after the delete cmds executed:
+
+![](apiScreenShot/tableAfterDelete.png)
+
 having problem with get request
 
 https://us-east-1.console.aws.amazon.com/iam/home#/roles

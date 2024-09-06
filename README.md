@@ -18,3 +18,5 @@ https://us-east-1.console.aws.amazon.com/iam/home#/roles
 https://stackoverflow.com/questions/42354001/json-object-must-be-str-bytes-or-bytearray-not-dict
 
 - reserved keywords
+
+https://stackoverflow.com/questions/74920856/invalid-updateexpression-attribute-name-is-a-reserved-keyword-reserved-keyword

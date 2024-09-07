@@ -90,7 +90,7 @@ def lambda_handler(event, context):
         logger.info(f"body.items: {body.items()}")
 
         for key, value in body.items():
-            if key in ['name', 'course']:
+            if key in ['name']:
                 expression_attribute_names[f'#{key}'] = key
                 update_expression += f" #{key} = :{key},"
                 expression_attribute_values[f":{key}"] = value

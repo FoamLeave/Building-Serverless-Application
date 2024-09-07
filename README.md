@@ -128,7 +128,7 @@ Now, the StudentRecoradHandler was able to retrieve and modify DynamoDB records.
 
         update_expression = update_expression.rstrip(',')
 
-         try:
+        try:
             table.update_item(
                 Key={'student_id': student_id},
                 UpdateExpression=update_expression,
